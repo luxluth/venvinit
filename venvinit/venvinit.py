@@ -112,10 +112,7 @@ class Config:
     def remove(self):
         os.remove(CONFIG_PATH)
 
-# test
-# cfg = Config(init=True, venv_name="test", pip_path="pip", python_path="python")
-
-
+        
 class GetConfig:
     def __init__(self):
         # check if config file exists
