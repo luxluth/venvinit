@@ -18,7 +18,7 @@ import curses
 
 CWD = os.getcwd()
 CONFIG_PATH = f"{CWD}/.venvinit.config.ini"
-VERSION = "0.0.1"
+VERSION = "0.0.3"
 
 ####################
 #      COLORS      #

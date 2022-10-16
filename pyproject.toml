@@ -30,7 +30,7 @@ dependencies = [
 Homepage = "https://github.com/luxluth/venvinit"
 
 [project.scripts]
-venvinit = "venvinit:main"
+venvinit = "venvinit:venvinit.main"
 
 [tool.hatch.version]
 path = "venvinit/__init__.py"
