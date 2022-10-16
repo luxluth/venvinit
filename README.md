@@ -16,6 +16,7 @@ venvinit [COMMAND] [ATTR] [OPTIONS]
 | `remove` | Remove a virtual environment. |
 | `help` | Show help. |
 
+
 ### Attributes
 
 | Attribute | Description |
@@ -58,25 +59,37 @@ venvinit create
 ### Create a virtual environment with custom name set
 
 ```bash
-venvinit create myvenv
+venvinit create [VENV_NAME]
 ```
 
 ### Create a virtual environment with dependencies installation
 
 ```bash
-venvinit create myenv -deps
+venvinit create [VENV_NAME] -deps
 ```
 
 ### Create a virtual environment with dependencies installation and custom dependencies file
 
 ```bash
-venvinit create myenv -deps requirements.txt
+venvinit create [VENV_NAME] -deps [DEPS_FILE]
+```
+
+
+### Activate a virtual environment
+
+```bash
+venvinit activate [VENV_NAME]
+```
+### Deactivate a virtual environment
+
+```bash
+venvinit deactivate [VENV_NAME]
 ```
 
 ### Remove a virtual environment
 
 ```bash
-venvinit remove myenv
+venvinit remove [VENV_NAME]
 ```
 or
 
