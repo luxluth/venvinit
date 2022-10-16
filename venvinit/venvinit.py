@@ -216,22 +216,23 @@ class VersionControl:
     """
     check if there is not more recent package of venvinit
     """
+
     def __init__(self):
-        self.venvinit_version = subprocess.check_output(["pip", "show", "venvinit"]).decode("utf-8").split("Version: ")[1].split("")[0]
-        self.venvinit_version = self.venvinit_version.split(".")
-        self.venvinit_version = [int(i) for i in self.venvinit_version]
-        self.venvinit_version = tuple(self.venvinit_version)
+        self.venvinit_version = subprocess.check_output(
+            ["pip", "show", "venvinit"]).decode("utf-8").split("Version: ")[1].split(" ")[0]
 
     def check(self):
-        self.latest_version = requests.get("https://pypi.org/pypi/venvinit/json").json()["info"]["version"]
-        self.latest_version = self.latest_version.split(".")
-        self.latest_version = [int(i) for i in self.latest_version]
-        self.latest_version = tuple(self.latest_version)
+        self.latest_version = requests.get(
+            "https://pypi.org/pypi/venvinit/json").json()["info"]["version"]
         if self.venvinit_version < self.latest_version:
-            print(Colors.clr("There is a newer version of venvinit available", Colors.YELLOW))
-            print(Colors.clr("Current version: ", Colors.GRAY) + Colors.clr(f"{self.venvinit_version}", Colors.WHITE))
-            print(Colors.clr("Latest version: ", Colors.GRAY) + Colors.clr(f"{self.latest_version}", Colors.WHITE))
-            print(Colors.clr("Run ", Colors.GRAY) + Colors.clr("pip install --upgrade venvinit", Colors.WHITE) + Colors.clr(" to upgrade", Colors.GRAY))
+            print(Colors.clr(
+                "There is a newer version of venvinit available", Colors.YELLOW))
+            print(Colors.clr("Current version: ", Colors.GRAY) +
+                  Colors.clr(f"{self.venvinit_version}", Colors.WHITE))
+            print(Colors.clr("Latest version: ", Colors.GRAY) +
+                  Colors.clr(f"{self.latest_version}", Colors.WHITE))
+            print(Colors.clr("Run ", Colors.GRAY) + Colors.clr("pip install --upgrade venvinit",
+                  Colors.WHITE) + Colors.clr(" to upgrade", Colors.GRAY))
         else:
             print(Colors.clr("venvinit is up to date", Colors.GREEN))
 
