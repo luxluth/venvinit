@@ -1,0 +1,128 @@
+#!/usr/bin/env python3
+
+
+import os
+import subprocess
+import sys
+import time
+
+class Colors:
+    GREEN = '\033[0;49;32m'
+    BLUE = '\033[0;49;34m'
+    YELLOW = '\033[0;49;93m'
+    RED = '\033[0;49;91m'
+    BOLD = '\033[;1m'
+    UNDERLINE = '\033[;4m'
+    END = '\033[0m'
+    GREY = '\033[0;49;90m'
+    WHITE = '\033[0;49;97m'
+
+
+# know if the program start with an argument
+ARG = sys.argv[1] if len(sys.argv) > 1 else None
+OPT = sys.argv[2] if len(sys.argv) > 2 else None
+OPT2 = sys.argv[3] if len(sys.argv) > 3 else None
+ENV_NAME = ".venv"
+
+def help():
+    print("""
+     Usage: venvinit [COMMAND] [ATTR] [OPTIONS]\n
+     --env : create a new python virtual environment
+        --env [ENV_NAME] : create a new python virtual environment with a custom name
+     --env -deps : install dependencies to requirements.txt
+        --env [ENV_NAME] -deps : install dependencies to requirements.txt with a custom name
+
+     --rm : remove virtual environment. useful if you want\n\tto create one with the same name
+     --rm [ENV_NAME] : remove virtual environment with a given name
+
+     --help : show this help
+    """)
+
+def help_soft():
+    print("""
+    Usage: venvinit [COMMAND] [OPTIONS]\n
+    --help : show pynit help
+    """)
+
+###############
+# ENVIRONMENT #
+###############
+
+if ARG == "--env":
+    # create a new python3 virtual environment
+    startTime = time.time()
+    print(f"{Colors.GREY}Creating virtual environment{Colors.END} {Colors.WHITE}{ENV_NAME}{Colors.END}")
+    if os.name == "nt":
+        subprocess.call(["py", "-m", "venv", f"{ENV_NAME}"])
+    else:
+        subprocess.call(["python3", "-m", "venv", f"{ENV_NAME}"])
+
+    # activate new environment
+    print(f'{Colors.GREY}Activating virtual environment{Colors.END} {Colors.WHITE}{ENV_NAME}{Colors.END}')
+    if os.name == "nt":
+        subprocess.call([ENV_NAME + "\\Scripts\\activate.bat"])
+    else:
+        subprocess.call(f"source {ENV_NAME}/bin/activate", shell=True)
+
+    # upgrade pip
+    print(f'{Colors.GREY}Upgrading pip{Colors.END}')
+    subprocess.call([f"{ENV_NAME}/bin/pip", "install", "pip", "--upgrade"])
+
+    # set environment name
+    os.environ["Environment"] = ENV_NAME
+
+    # install requirements.txt dependencies
+    if OPT == "-deps":
+        print(f"{Colors.GREY}Environment {Colors.GREEN}{ENV_NAME}{Colors.END}{Colors.GREY} loaded. Installing dependencies{Colors.END}")
+        subprocess.call([f"{ENV_NAME}/bin/pip", "install",
+                        "-r", "requirements.txt"])
+
+    finishTime = time.time()
+    print(f'\n{Colors.BLUE}{finishTime - startTime:0.4}{Colors.END} s')
+
+elif ARG == "--rm" and OPT == "":
+    startTime = time.time()
+    print(f"{Colors.GREY}Removing virtual environment{Colors.END} {Colors.WHITE}{ENV_NAME}{Colors.END}")
+    if os.name == "nt":
+        try:
+            subprocess.call(f"rd /S /Q {ENV_NAME}", shell=True)
+        except Exception as e:
+            print(f"{Colors.RED}{e}{Colors.END}")
+    else:
+        try:
+            subprocess.call(f"rm -rf ./{ENV_NAME}", shell=True)
+        except Exception as e:
+            print(f"{Colors.RED}{e}{Colors.END}")
+
+    finishTime = time.time()
+    print(f'\n{Colors.BLUE}{finishTime - startTime:0.4}{Colors.END} s')
+
+elif ARG == "--rm":
+    startTime = time.time()
+    print(f"{Colors.GREY}Removing virtual environment{Colors.END} {Colors.WHITE}{OPT}{Colors.END}")
+    if os.name == "nt":
+        try:
+            subprocess.call(f"rd /S /Q {OPT}", shell=True)
+        except Exception as e:
+            print(f"{Colors.RED}{e}{Colors.END}")
+    else:
+        try:
+            subprocess.call(f"rm -rf ./{OPT}", shell=True)
+        except Exception as e:
+            print(f"{Colors.RED}{e}{Colors.END}")
+
+    finishTime = time.time()
+    print(f'\n{Colors.BLUE}{finishTime - startTime:0.4}{Colors.END} s')
+
+elif ARG == "--help":
+    help()
+
+else:
+    help_soft()
+    if ARG or OPT:
+        print(f'"{Colors.UNDERLINE}{ARG}{Colors.END}" or "{Colors.UNDERLINE}{OPT}{Colors.END}" is not a recognized command.\n{Colors.GREY}See {Colors.WHITE}./pynit --help{Colors.END}{Colors.GREY} for a list of available commands.{Colors.END}\n')
+        sys.exit(1)
+    print(f"{Colors.RED}{Colors.BOLD}NO COMMAND PROVIDE !!!\n{Colors.WHITE}./pynit --help{Colors.END} for more information\n")
+    sys.exit(1)
+
+sys.exit(0)
