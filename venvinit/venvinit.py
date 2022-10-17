@@ -18,7 +18,6 @@ import curses
 
 CWD = os.getcwd()
 CONFIG_PATH = f"{CWD}/.venvinit.config.ini"
-VERSION = "0.0.4"
 
 ####################
 #      COLORS      #
@@ -112,7 +111,7 @@ class Config:
     def remove(self):
         os.remove(CONFIG_PATH)
 
-        
+
 class GetConfig:
     def __init__(self):
         # check if config file exists
@@ -217,21 +216,44 @@ class VersionControl:
     def __init__(self):
         self.venvinit_version = subprocess.check_output(
             ["pip", "show", "venvinit"]).decode("utf-8").split("Version: ")[1].split(" ")[0]
+        self.venvint_version_split = self.venvinit_version.split(".")
+        self.major = int(self.venvint_version_split[0])
+        self.minor = int(self.venvint_version_split[1])
+        self.patch = int(self.venvint_version_split[2].split("\n")[0])
+        self.version = f"{self.major}.{self.minor}.{self.patch}"
+
+    def upgradeMessage(self):
+        print(Colors.clr(
+            "There is a newer version of venvinit available", Colors.YELLOW))
+        print(Colors.clr("Current version: ", Colors.GRAY) +
+              Colors.clr(f"{self.venvinit_version}", Colors.WHITE))
+        print(Colors.clr("Latest version: ", Colors.GRAY) +
+              Colors.clr(f"{self.latest_version}", Colors.WHITE))
+        print(Colors.clr("Run ", Colors.GRAY) + Colors.clr("pip install --upgrade venvinit",
+                                                           Colors.WHITE) + Colors.clr(" to upgrade", Colors.GRAY))
+
+    def getVersion(self):
+        return self.version
 
     def check(self):
-        self.latest_version = requests.get(
-            "https://pypi.org/pypi/venvinit/json").json()["info"]["version"]
-        if self.venvinit_version < self.latest_version:
-            print(Colors.clr(
-                "There is a newer version of venvinit available", Colors.YELLOW))
-            print(Colors.clr("Current version: ", Colors.GRAY) +
-                  Colors.clr(f"{self.venvinit_version}", Colors.WHITE))
-            print(Colors.clr("Latest version: ", Colors.GRAY) +
-                  Colors.clr(f"{self.latest_version}", Colors.WHITE))
-            print(Colors.clr("Run ", Colors.GRAY) + Colors.clr("pip install --upgrade venvinit",
-                  Colors.WHITE) + Colors.clr(" to upgrade", Colors.GRAY))
-        else:
-            print(Colors.clr("venvinit is up to date", Colors.GREEN))
+
+        try:
+            self.latest_version: str = requests.get("https://pypi.org/pypi/venvinit/json").json()["info"]["version"]
+            self.latest_version_split = self.latest_version.split(".")
+            self.last_major = int(self.latest_version_split[0])
+            self.last_minor = int(self.latest_version_split[1])
+            self.last_patch = int(self.latest_version_split[2])
+
+            if self.last_major == self.major:
+                if self.last_minor == self.minor and self.last_patch == self.patch:
+                    print(Colors.clr("venvinit is up to date", Colors.GREEN))
+                elif self.last_minor == self.minor and self.last_patch > self.patch or self.last_minor != self.minor and self.last_minor > self.minor:
+                    self.upgradeMessage()
+            elif self.last_major > self.major:
+                self.upgradeMessage()
+
+        except requests.exceptions.ConnectionError:
+            print(Colors.clr("Failed to check for updates", Colors.RED))
 
 
 
@@ -266,9 +288,9 @@ def main():
     elif len(sys.argv) == 2:
         if sys.argv[1] in ["version", "-v", "--version"]:
             print(Colors.clr("venvinit", Colors.WHITE))
-            print(f'v{VERSION}')
-            print(Colors.clr("MIT LICENSE", Colors.WHITE))
             vc = VersionControl()
+            print(f'v{vc.getVersion()}')
+            print(Colors.clr("MIT LICENSE", Colors.WHITE))
             vc.check()
             sys.exit(0)
 
